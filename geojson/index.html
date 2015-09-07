@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--link rel="shortcut icon" sizes="25x25" href="assets/icon.png"-->
+    <title>Leaflet.Select.Feature</title>
+
+    <link rel="stylesheet" href="assets/bootstrap-3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/leaflet-0.7.5/leaflet.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            width: 100%;
+            height: 550px
+        }		
+    </style>
+
+</head>
+
+<body>
+	<div class="container">	
+
+		
+        <div id="hr-divider">
+            <hr>
+        </div>
+		
+        <div id="map" class="centerish"></div>
+		<form>
+		  <div class="form-group">
+			<label style="font-size: 12px;">Выбрано объектов:</label>
+			<label style="font-size: 12px;" id="selectedCount">0</label>
+			<textarea class="form-control" value="" rows="2" id="selectedFeatures"></textarea>
+		  </div>
+		</form>
+
+
+        <div id="hr-divider">
+            <hr>
+        </div>	
+
+</div>		
+	
+    <script src="assets/jquery-1.11.3.min.js"></script>
+    <script src="assets/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+    <script src="assets/leaflet-0.7.5/leaflet.js"></script>
+
+    <script>
+	
+	
+        // add OpenStreetMap layer
+        var layerOSM = new L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; Map Data <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+		// add MapBoxImagery layer
+        var layerMapBoxImagery = new L.tileLayer('http://{s}.tiles.mapbox.com/v4/openstreetmap.map-inh7ifmo/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoib3BlbnN0cmVldG1hcCIsImEiOiJhNVlHd29ZIn0.ti6wATGDWOmCnCYen-Ip7Q', {
+            maxZoom: 17,
+            attribution: 'Data &copy; <a href="http://www.openstreetmap.org/copyright/en">OSM</a> contributors (ODbL), rendering ' +
+                '<a href="http://giscience.uni-hd.de/" target="_blank">GIScience Research Group @ University of Heidelberg</a>'
+        });		
+	
+
+	
+        // initialize map
+        var map = new L.Map('map', {
+            minZoom: 1,
+            maxZoom: 18,
+			layers: [layerOSM]
+        }).setView([51.083, 28.189], 10);
+
+		var baseMaps = {
+			"OpenStreetMap": layerOSM,
+			"MapBox Imagery": layerMapBoxImagery
+		};
+		L.control.layers(baseMaps, null, {collapsed: false}).addTo(map);
+
+		
+		
+        // add topo250 layer		
+        var topo250 = L.geoJson(null, {
+            style: function(feature) {
+                return {
+                    color: "red",
+                    fill: true,
+                    opacity: 1,
+                    fillOpacity: 0.001,
+                    weight: 1
+                }
+            },
+            onEachFeature: function(feature, layer_topo250) {
+
+                layer_topo250.on({
+                    click: function(e) {
+
+                        var layer_topo250 = e.target;
+
+                        if (layer_topo250.options.color == '#00FFFF') {
+						
+                            topo250.resetStyle(e.target);
+							
+							e.target.feature.properties.selected = false;
+							
+							//console.log("deselected " + feature.properties.name);
+							
+                        } else {
+						
+                            layer_topo250.setStyle({
+                                weight: 3,
+                                color: "#00FFFF",
+                                opacity: 1,
+                                fillOpacity: 0.1
+                            });
+
+							//console.log("selected " + feature.properties.name);
+							
+							e.target.feature.properties.selected = true;
+
+							//$('#selectedFeatures').text( feature.properties.name );
+							
+							
+                        }
+					
+											
+						getAllElements();
+					
+                        if (!L.Browser.ie && !L.Browser.opera) {
+                            layer_topo250.bringToFront();
+                        }
+
+                    }
+                });
+            }
+        });
+
+        $.getJSON("data/topo250m.geojson", function(data) {   // 34KB
+            topo250.addData(data);
+        });
+        topo250.addTo(map);
+
+		
+
+		function getAllElements() {
+			var selectedFeatureName = [];
+            $.each(map._layers, function (ml) {
+                if (map._layers[ml].feature && map._layers[ml].feature.properties.selected === true) {
+					selectedFeatureName.push(map._layers[ml].feature.properties.name);
+                }
+            });
+            //console.log(selectedFeatureName);
+			$('#selectedFeatures').text( selectedFeatureName );
+			$('#selectedCount').text( selectedFeatureName.length );
+		};
+		
+		
+		
+		
+    </script>
+</body>
+
+</html>
