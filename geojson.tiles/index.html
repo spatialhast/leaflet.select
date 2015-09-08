@@ -115,7 +115,7 @@ var geojsonTileLayer = new L.TileLayer.GeoJSON(geojsonURL, {
     clipTiles: true,
     unique: function(feature) {
         return feature.properties.gid;
-        console.log(feature.properties.gid);
+        //console.log(feature.properties.gid);
     }
 }, {
     style: style,
@@ -123,23 +123,40 @@ var geojsonTileLayer = new L.TileLayer.GeoJSON(geojsonURL, {
 
 
 
-
             layer.on('click', function() {
 
 
 
+// при выборе ячейки передается два объекта если ячейка на границе тайла
+// передать выбранные ячейки в массив
+// если для выбранного объекта уже существует идентичный объект в массиве - то удалять его из массива (и не добавлять новый объект)
+
+// отрисовывать массив на карте
+// выводить атрибыты всех объектов из массива
 
 
 
-                    console.log(feature);
+// проблемы Tilestache vt:
+// есть линии разрезки тайлов
+
+// проблемы mmt vt:
+// mmt тайлы отображаются корректно (за счет опции перекрытия), но при выделении ячейки заметны границы перекрытия
+// необходимо дополнительно изменить кодировку для тайлов
+
+    
+    var selectedTopo = null;
+    selectedTopo = feature;
+
+
+    drawLayer(selectedTopo);
+
+
+                   //console.log(arrG.properties.gid);
                     
 
 
 
-
-
-
-                    L.geoJson(feature).addTo(map);
+                   // L.geoJson(arrG).addTo(map);
 
 
 
@@ -154,6 +171,41 @@ var geojsonTileLayer = new L.TileLayer.GeoJSON(geojsonURL, {
     }
 });
 map.addLayer(geojsonTileLayer);
+
+
+
+
+// инициализируем новый слой, который будет отображаться на карте
+var selectedFeatureLayer = L.geoJson(null, { 
+
+});
+
+
+
+
+// инициализируем функцию, которая будет передавать данные из выбранной ячейки в слой для отображения данных на карте
+var drawLayer = function drawLayer(selectedTopo) {
+    console.log(selectedTopo);
+
+    selectedFeatureLayer.addData(selectedTopo);
+    selectedFeatureLayer.addTo(map);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
