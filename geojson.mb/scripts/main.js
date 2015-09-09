@@ -51,11 +51,11 @@ function createLayer () {
             //'fill-outline-color': '#CCCCFF'
         },
         'filter': [
-            '<=', selAttribute, 0.49
+        '<=', selAttribute, 0.49
         ]
     });
 
-	
+    
 
     map.addLayer({
         'id': 'ec-layer2',
@@ -111,11 +111,11 @@ function createLayer () {
             //'fill-outline-color': '#CCCCFF'
         },
         'filter': [
-            '>=', selAttribute, 1.46
+        '>=', selAttribute, 1.46
         ]
     });
 
-	
+    
     map.addLayer({
         'id': 'borders',
         'type': 'line',
@@ -128,9 +128,9 @@ function createLayer () {
         }
     });
 
-	
-	
-	
+    
+    
+    
 	/*
     // text lables
     map.addLayer({
@@ -154,17 +154,15 @@ function createLayer () {
 
     // mouse click event
     map.on('click', function(e) {
-      	map.featuresAt(e.point, { radius : 6}, function(err, features) {
-            
+     map.featuresAt(e.point, { radius : 6}, function(err, features) {
+        
 			//console.log('features:');
-            //console.log(features);
-			
+            console.log(features);
+            
             //console.log(features[0].properties);
-            console.log(features[0].geometry);
-			
-			
-			
-			
+           // console.log(features[0].geometry);
+           
+
 			/*
           	if (err) throw err;
                 $('#name').empty();
@@ -180,16 +178,16 @@ function createLayer () {
                     values.push(features[0].properties[tmp]);
                 }
                 chart(keys, values, name);
-				*/
-				
-				
-				
-				
-      		});
-  	});
-	
-	
-	
+                */
+                
+                
+                
+                
+            });
+});
+
+
+
 /*
 
     /////////////////////////////////////////
@@ -283,8 +281,8 @@ function createLayer () {
             .attr("fill", function(d, i) { return color(i); } )
             .attr("d", arc);
 			
-*/			
-			
+            */			
+            
 /*
         // Chart legend
         var legend = d3.select("#features").append("svg")
@@ -306,13 +304,13 @@ function createLayer () {
             .attr("y", 30)
             .attr("dy", ".35em")
             .text(function(d) { return d.label; });
-*/
+            */
 //    }
 
-	
-	
-	
-	
+
+
+
+
 };
 
 
