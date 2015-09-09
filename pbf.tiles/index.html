@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Leaflet.Select.Tilemaker.PBF.Tiles</title>
+
+    <link rel="stylesheet" href="assets/bootstrap-3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/leaflet-0.7.5/leaflet.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            width: 100%;
+            height: 550px
+        }		
+    </style>
+
+</head>
+
+<body>
+	<div class="container">	
+		
+        <div id="hr-divider">
+            <hr>
+        </div>
+
+        <div id="map" class="centerish"></div>
+        <form>
+            <div class="form-group">
+             <label style="font-size: 12px;">Selected features:</label>
+             <label style="font-size: 12px;" id="selectedCount">0</label>
+             <textarea class="form-control" value="" rows="2" id="selectedFeatures"></textarea>
+         </div>
+     </form>
+
+
+     <div id="hr-divider">
+        <hr>
+    </div>	
+
+</div>		
+
+<script src="assets/jquery-2.1.1.min.js"></script>
+<script src="assets/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="assets/leaflet-0.7.5/leaflet.js"></script>
+<script src="assets/Leaflet.MapboxVectorTile.js"></script>
+
+<script>
+	
+	
+        // add OpenStreetMap layer
+        var layerOSM = new L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; Map Data <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+		// add MapBoxImagery layer
+        var layerMapBoxImagery = new L.tileLayer('http://{s}.tiles.mapbox.com/v4/openstreetmap.map-inh7ifmo/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoib3BlbnN0cmVldG1hcCIsImEiOiJhNVlHd29ZIn0.ti6wATGDWOmCnCYen-Ip7Q', {
+            maxZoom: 17,
+            attribution: 'Data &copy; <a href="http://www.openstreetmap.org/copyright/en">OSM</a> contributors (ODbL), rendering ' +
+            '<a href="http://giscience.uni-hd.de/" target="_blank">GIScience Research Group @ University of Heidelberg</a>'
+        });		
+
+
+
+        // initialize map
+        var map = new L.Map('map', {
+            minZoom: 1,
+            maxZoom: 18,
+            layers: [layerOSM]
+        }).setView([49.8409, 24.0317], 13);
+
+        var baseMaps = {
+         "OpenStreetMap": layerOSM,
+         "MapBox Imagery": layerMapBoxImagery
+		};
+		L.control.layers(baseMaps, null, {collapsed: false}).addTo(map);
+
+
+		var debug = {};
+
+
+
+		var mvtSource = new L.TileLayer.MVTSource({
+		  url: "data/tilemaker.tiles/{z}/{x}/{y}.pbf",
+		  debug: true,
+		  clickableLayers: ["buildings"],
+		  getIDForLayerFeature: function(feature) {
+			return feature.properties.osm_id;
+		  },
+
+		  /**
+		   * The filter function gets called when iterating though each vector tile feature (vtf). You have access
+		   * to every property associated with a given feature (the feature, and the layer). You can also filter
+		   * based of the context (each tile that the feature is drawn onto).
+		   *
+		   * Returning false skips over the feature and it is not drawn.
+		   *
+		   * @param feature
+		   * @returns {boolean}
+		   */
+		  filter: function(feature, context) {
+			if (feature.layer.name === 'buildings') {
+			  return true;
+			}
+			return false;
+		  },
+
+		onEachFeature: function(feature, layer_topo50) { 
+
+
+
+
+
+		},
+		  
+		  
+		  style: function (feature) {
+			var style = {};
+
+			var type = feature.type;
+			switch (type) {
+			  case 1: //'Point'
+				style.color = 'rgba(49,79,79,1)';
+				style.radius = 5;
+				style.selected = {
+				  color: 'rgba(255,255,0,0.5)',
+				  radius: 6
+				};
+				break;
+			  case 2: //'LineString'
+				style.color = 'rgba(161,217,155,0.8)';
+				style.size = 3;
+				style.selected = {
+				  color: 'rgba(255,25,0,0.5)',
+				  size: 4
+				};
+				break;
+			  case 3: //'Polygon'
+				style.color = fillColor;
+				style.outline = {
+				  color: strokeColor,
+				  size: 5
+				};
+				style.selected = {
+				  color: 'rgba(255,140,0,0.3)',
+				  outline: {
+					color: 'rgba(255,140,0,1)',
+					size: 6
+				  }
+				};
+				break;
+			}
+			return style;
+		  }
+
+		});
+		debug.mvtSource = mvtSource;
+
+
+
+
+		//Globals that we can change later.
+		var fillColor = 'rgba(149,139,255,0.4)';
+		var strokeColor = 'rgb(20,20,20)';
+
+		//Add layer
+		map.addLayer(mvtSource);
+
+
+
+
+		mvtSource.on({
+			click: function(e) {
+				console.log(e);
+			}
+		});
+
+
+
+
+
+		
+		
+		
+
+/*
+// Get MapZoom an MapCenter: map.setView([49.8376, 23.9761], 13);   
+map.on('moveend ', function(e) {   
+console.log("map.setView([" + map.getCenter().lat.toFixed(4) + ", " + map.getCenter().lng.toFixed(4) + "], " + map.getZoom() + ");");   
+});    
+*/
+
+/*
+// Get MapBounds: [[49.7405,23.6858],[49.9550,24.3450]]
+map.on('moveend ', function(e) {
+console.log("[[" + map.getBounds()._southWest.lat.toFixed(4) + "," + map.getBounds()._southWest.lng.toFixed(4) + "],[" + map.getBounds()._northEast.lat.toFixed(4) + "," + map.getBounds()._northEast.lng.toFixed(4) + "]]");
+});
+*/
+	 
+	 
+	 
+
+
+    </script>
+
+</body>
+
+</html>
