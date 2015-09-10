@@ -121,46 +121,29 @@ var geojsonTileLayer = new L.TileLayer.GeoJSON(geojsonURL, {
 
 
 
-            layer.on('click', function() {
+        layer.on('click', function() {
 
 
 
-// при выборе ячейки передается два объекта если ячейка на границе тайла
-// передать выбранные ячейки в массив
-// если для выбранного объекта уже существует идентичный объект в массиве - то удалять его из массива (и не добавлять новый объект)
-
-// отрисовывать массив на карте
-// выводить атрибыты всех объектов из массива
+var selectedTopo = null;
+selectedTopo = feature;
 
 
-
-// проблемы Tilestache vt:
-// есть линии разрезки тайлов
-
-// проблемы mmt vt:
-// mmt тайлы отображаются корректно (за счет опции перекрытия), но при выделении ячейки заметны границы перекрытия
-// необходимо дополнительно изменить кодировку для тайлов
-
-    
-    var selectedTopo = null;
-    selectedTopo = feature;
+drawLayer(selectedTopo);
 
 
-    drawLayer(selectedTopo);
-
-
-                   //console.log(arrG.properties.gid);
-                    
+//console.log(arrG.properties.gid);
 
 
 
-                   // L.geoJson(arrG).addTo(map);
+
+// L.geoJson(arrG).addTo(map);
 
 
 
 
 
-            });
+});
 
 
 
@@ -173,20 +156,77 @@ map.addLayer(geojsonTileLayer);
 
 
 
+
+var delfeature = null;
+
+
 // инициализируем новый слой, который будет отображаться на карте
 var selectedFeatureLayer = L.geoJson(null, { 
+
+    onEachFeature: function(feature, layer) {
+        layer.on('click', function() {
+
+
+
+
+            delfeature = feature;
+
+
+            draw (delfeature);
+
+
+
+
+        })
+    }
+
 
 });
 
 
 
 
-// инициализируем функцию, которая будет передавать данные из выбранной ячейки в слой для отображения данных на карте
-var drawLayer = function drawLayer(selectedTopo) {
-    console.log(selectedTopo);
 
-    selectedFeatureLayer.addData(selectedTopo);
-    selectedFeatureLayer.addTo(map);
+
+function draw (delfeature) {
+
+
+
+//console.log(JSON.stringify(delfeature));
+
+//fullLayer.indexOf(delfeature);
+
+
+
+
+
+var one = JSON.stringify(delfeature);
+var full = JSON.stringify(fullLayer);
+
+
+var n = full.replace(one, '');
+
+
+console.log(n);
+
+
+
+selectedFeatureLayer.clearLayers();
+selectedFeatureLayer.addData(fullLayer);
+selectedFeatureLayer.addTo(map);
+
+
+
+
+
+
+//console.log(JSON.stringify(delfeature));
+//console.log(JSON.stringify(fullLayer));
+
+
+
+
+
 };
 
 
@@ -195,238 +235,40 @@ var drawLayer = function drawLayer(selectedTopo) {
 
 
 
+var fullLayer = [];
+
+
+var drawLayer = function drawLayer(selectedTopo) {
+
+
+    fullLayer.push(selectedTopo);
+
+
+    //console.log(selectedTopo);
+
+
+    draw (delfeature);
+
+
+    console.clear(); 
+
+
+
+    var gid = [];
+    //console.log(fullLayer);
+    for(i=0; i<fullLayer.length; i++) {
+        gid.push(fullLayer[i].properties.gid); // get 'gid' for each element in array
+        //console.log(fullLayer[i].properties.gid)
+    };
+
+
+    gid = jQuery.unique( gid ); // delete duplicate 'gid'
+    console.log(gid);
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-        if (feature.properties) {
-            var popupString = '<div class="popup">';
-            for (var k in feature.properties) {
-                var v = feature.properties[k];
-                popupString += k + ': ' + v + '<br />';
-            }
-            popupString += '</div>';
-            layer.bindPopup(popupString);
-            console.log(feature.properties);
-
-        }
-*/
-
-
-/*
-        if (!(layer instanceof L.Point)) {
-            layer.on('mouseover', function() {
-                layer.setStyle(hoverStyle);
-            });
-            layer.on('mouseout', function() {
-                layer.setStyle(style);
-            });
-        }
-
-*/
-
-
-
-
-
-
-
-/*		
-		select deselect tile
-		
-	        var style = {
-            "clickable": true,
-            "color": "#00D",
-            "fillColor": "#00D",
-            "weight": 1.0,
-            "opacity": 0.3,
-            "fillOpacity": 0.2
-        };
-        var hoverStyle = {
-            "fillOpacity": 0.5
-        };
-
-        var geojsonURL = 'data/mmt.vector.tiles.kharkov.buildings/{z}/{x}/{y}.geojson';
-
-        var geojsonTileLayer = new L.TileLayer.GeoJSON(geojsonURL, {
-            clipTiles: true,
-            unique: function(feature) {
-                return feature.properties.gid;
-                console.log(feature.properties.gid);
-            }
-        }, {
-            style: style,
-            onEachFeature: function(feature, layer) {
-                */
-
-			/*
-			
-                if (feature.properties) {
-                    var popupString = '<div class="popup">';
-                    for (var k in feature.properties) {
-                        var v = feature.properties[k];
-                        popupString += k + ': ' + v + '<br />';
-                    }
-                    popupString += '</div>';
-                    layer.bindPopup(popupString);
-                }
-                if (!(layer instanceof L.Point)) {
-                    layer.on('mouseover', function() {
-                        layer.setStyle(hoverStyle);
-                    });
-                    layer.on('mouseout', function() {
-                        layer.setStyle(style);
-                    });
-                };
-                */
-
-/*			
-                layer.on({
-                    click: function(e) {
-
-                        var layer = e.target;
-						
-
-                        if (layer.feature.properties.selected == true) {
-						
-                            layer.setStyle({
-								"clickable": true,
-								"color": "#00D",
-								"fillColor": "#00D",
-								"weight": 1.0,
-								"opacity": 0.3,
-								"fillOpacity": 0.2
-                            });						
-						
-							
-							layer.feature.properties.selected = false;
-							
-							console.log("deselected " + feature.properties.gid);
-							
-                        } else {
-						
-                            layer.setStyle({
-                                weight: 3,
-                                color: "#00FFFF",
-                                opacity: 1,
-                                fillOpacity: 0.1
-                            });
-
-							console.log("selected " + feature.properties.gid);
-							
-							e.target.feature.properties.selected = true;
-
-                        }
-
-                    }
-                });
-
-				
-            }
-        });
-        map.addLayer(geojsonTileLayer);	
-		
-		
-        */		
-
-
-
-
-
-/*
-	
-        // add topo250 layer		
-        var topo250 = L.geoJson(null, {
-            style: function(feature) {
-                return {
-                    color: "red",
-                    fill: true,
-                    opacity: 1,
-                    fillOpacity: 0.001,
-                    weight: 1
-                }
-            },
-            onEachFeature: function(feature, layer_topo250) {
-
-                layer_topo250.on({
-                    click: function(e) {
-
-                        var layer_topo250 = e.target;
-
-                        if (layer_topo250.options.color == '#00FFFF') {
-						
-                            topo250.resetStyle(e.target);
-							
-							e.target.feature.properties.selected = false;
-							
-							//console.log("deselected " + feature.properties.name);
-							
-                        } else {
-						
-                            layer_topo250.setStyle({
-                                weight: 3,
-                                color: "#00FFFF",
-                                opacity: 1,
-                                fillOpacity: 0.1
-                            });
-
-							//console.log("selected " + feature.properties.name);
-							
-							e.target.feature.properties.selected = true;
-
-							//$('#selectedFeatures').text( feature.properties.name );
-							
-							
-                        }
-					
-											
-						getAllElements();
-					
-                        if (!L.Browser.ie && !L.Browser.opera) {
-                            layer_topo250.bringToFront();
-                        }
-
-                    }
-                });
-            }
-        });
-
-        $.getJSON("data/topo250m.geojson", function(data) {   // 34KB
-            topo250.addData(data);
-        });
-        topo250.addTo(map);
-
-		
-
-		function getAllElements() {
-			var selectedFeatureName = [];
-            $.each(map._layers, function (ml) {
-                if (map._layers[ml].feature && map._layers[ml].feature.properties.selected === true) {
-					selectedFeatureName.push(map._layers[ml].feature.properties.name);
-                }
-            });
-            //console.log(selectedFeatureName);
-			$('#selectedFeatures').text( selectedFeatureName );
-			$('#selectedCount').text( selectedFeatureName.length );
-		};
-		
-        */		
+};
 
 
     </script>
