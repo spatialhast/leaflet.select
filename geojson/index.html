@@ -89,8 +89,8 @@
 
 		
 		
-        // add topo250 layer		
-        var topo250 = L.geoJson(null, {
+        // add topo layer		
+        var topo = L.geoJson(null, {
             style: function(feature) {
                 return {
                     color: "red",
@@ -100,16 +100,16 @@
                     weight: 1
                 }
             },
-            onEachFeature: function(feature, layer_topo250) {
+            onEachFeature: function(feature, layer_topo) {
 
-                layer_topo250.on({
+                layer_topo.on({
                     click: function(e) {
 
-                        var layer_topo250 = e.target;
+                        var layer_topo = e.target;
 
-                        if (layer_topo250.options.color == '#00FFFF') {
+                        if (layer_topo.options.color == '#00FFFF') {
 						
-                            topo250.resetStyle(e.target);
+                            topo.resetStyle(e.target);
 							
 							e.target.feature.properties.selected = false;
 							
@@ -117,7 +117,7 @@
 							
                         } else {
 						
-                            layer_topo250.setStyle({
+                            layer_topo.setStyle({
                                 weight: 3,
                                 color: "#00FFFF",
                                 opacity: 1,
@@ -137,7 +137,7 @@
 						getAllElements();
 					
                         if (!L.Browser.ie && !L.Browser.opera) {
-                            layer_topo250.bringToFront();
+                            layer_topo.bringToFront();
                         }
 
                     }
@@ -145,10 +145,10 @@
             }
         });
 
-        $.getJSON("data/topo250m.geojson", function(data) {   // 34KB
-            topo250.addData(data);
+        $.getJSON("data/topo.geojson", function(data) {   // 34KB
+            topo.addData(data);
         });
-        topo250.addTo(map);
+        topo.addTo(map);
 
 		
 
